@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Controle - Estilo Aeroporto</title>
+    <style>
+        /* Estilos básicos para a tabela e abas */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a; /* Cor de fundo escura para simular painel */
+            color: #FFFFFF; /* Toda a fonte restante na cor branca */
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #005500; /* Borda da célula */
+            padding: 8px;
+            text-align: left;
+            /* Propriedades para lidar com o estouro de texto */
+            white-space: nowrap; /* Impede que o texto quebre em várias linhas */
+            overflow: hidden;    /* Esconde o conteúdo que excede a largura */
+            text-overflow: ellipsis; /* Adiciona "..." ao final do texto cortado */
+            text-transform: uppercase; /* Toda a página em MAIÚSCULAS */
+        }
+        th {
+            background-color: #003300; /* Cor do cabeçalho */
+            font-weight: bold;
+            text-transform: uppercase; /* Transforma o texto em MAIÚSCULAS */
+            text-align: center; /* Centraliza o texto */
+            color: #00ff00; /* Cor dos cabeçalhos das colunas (mesma do título) */
+        }
+        .linha-dados:hover {
+            background-color: #004400; /* Efeito hover na linha */
+            cursor: pointer;
+        }
+        /* Classe para linha vencida */
+        .linha-vencida {
+            background-color: #8B0000 !important; /* Vermelho escuro */
+            color: #FFFFFF !important; /* Texto branco para contraste */
+            font-weight: bold;
+        }
+        .aba-oculta {
+            display: none; /* Esconde a aba por padrão */
+            background-color: #002200;
+            padding: 10px;
+            margin-top: 5px;
+        }
+        .aba-oculta input[type="text"],
+        .aba-oculta input[type="datetime-local"],
+        .aba-oculta select {
+            background-color: #333;
+            color: #FFFFFF; /* Texto de input em branco para contraste no background escuro */
+            border: 1px solid #00ff00;
+            padding: 5px;
+            margin-right: 5px;
+            text-transform: uppercase; /* Input de texto em MAIÚSCULAS */
+        }
+        /* Estilo para os radio buttons dentro da aba */
+        .aba-oculta input[type="radio"] {
+            margin-right: 5px;
+        }
+        .aba-oculta label {
+            margin-right: 15px;
+            text-transform: uppercase; /* Labels em MAIÚSCULAS */
+        }
+
+        /* --- Estilos para o Título e Registro --- */
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 3em;
+            color: #00ff00; /* Cor verde neon para o título principal */
+            margin: 0;
+            padding: 0;
+        }
+
+        .registro {
+            font-size: 1em;
+            color: red; /* Cor da fonte vermelha */
+            background-color: yellow; /* Cor de fundo amarela */
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            white-space: nowrap;
+            text-transform: uppercase; /* Registro em MAIÚSCULAS */
+        }
+
+        /* --- Cores dinâmicas para GE e CTE --- */
+        .ge-iniciado-app { color: yellow; }
+        .ge-final-app { color: #00FFFF; } /* Azul ciano */
+
+        .cte-nao-baixado { color: red; }
+        .cte-baixado { color: #00FFFF; } /* Azul ciano */
+
+        /* --- Estilo da Seta da Aba Oculta --- */
+        .arrow {
+            display: inline-block;
+            margin-right: 5px; /* Espaçamento da seta com o texto */
+            transition: transform 0.2s; /* Animação suave */
+            /* Basicamente um triângulo apontando para a direita */
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 5px solid #FFFFFF; /* Cor da seta (branco) */
+        }
+
+        .arrow.open {
+            transform: rotate(90deg); /* Gira 90 graus para baixo quando a aba está aberta */
+        }
+
+        /* --- Regras de Largura das Colunas --- */
+        table th:nth-child(1), table td:nth-child(1) { /* DATA */
+            max-width: 10ch;
+            width: 10ch;
+            text-align: center;
+        }
+        table th:nth-child(2), table td:nth-child(2) { /* MOTORISTA */
+            max-width: 15ch;
+            width: 15ch;
+        }
+        table th:nth-child(3), table td:nth-child(3) { /* PLACA */
+            max-width: 8ch;
+            width: 8ch;
+        }
+        table th:nth-child(4), table td:nth-child(4) { /* ORIGEM */
+            max-width: 19ch;
+            width: 19ch;
+        }
+        table th:nth-child(5), table td:nth-child(5) { /* POSIÇÃO/STATUS */
+            max-width: 30ch;
+            width: 30ch;
+        }
+        table th:nth-child(6), table td:nth-child(6) { /* DESTINO */
+            max-width: 15ch;
+            width: 15ch;
+        }
+        table th:nth-child(7), table td:nth-child(7) { /* GE */
+            max-width: 12ch;
+            width: 12ch;
+        }
+        table th:nth-child(8), table td:nth-child(8) { /* CTE */
+            max-width: 15ch;
+            width: 15ch;
+        }
+
+        /* --- Efeitos de Piscar para a Coluna Destino (anteriormente) --- */
+        @keyframes blink-green {
+            0%, 49% { color: #00FF00; } /* Verde neon */
+            50%, 100% { color: transparent; }
+        }
+        @keyframes blink-yellow {
+            0%, 49% { color: yellow; }
+            50%, 100% { color: transparent; }
+        }
+
+        .destino-outbound {
+            animation: blink-green 1s infinite;
+        }
+        .destino-ftl {
+            animation: blink-yellow 1s infinite;
+        }
+
+        /* --- Novos Efeitos de Piscar para OUT/FTL na linha principal --- */
+        @keyframes blink-out {
+            0%, 49% { opacity: 1; color: #00FF00; } /* Verde neon */
+            50%, 100% { opacity: 0; }
+        }
+        @keyframes blink-ftl {
+            0%, 49% { opacity: 1; color: yellow; }
+            50%, 100% { opacity: 0; }
+        }
+
+        .out-blinking {
+            animation: blink-out 1s infinite;
+        }
+        .ftl-blinking {
+            animation: blink-ftl 1s infinite;
+        }
+        
+        /* Oculta as palavras OUT/FTL por padrão para que apareçam só quando a animação iniciar */
+        .out-text, .ftl-text {
+            display: none; /* Oculta por padrão */
+            margin-left: 5px; /* Espaçamento */
+            font-weight: bold;
+        }
+        .out-text.show, .ftl-text.show {
+            display: inline-block; /* Mostra quando a classe 'show' é adicionada */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <h1>PAINEL DE CONTROLE</h1>
+        <span class="registro">Desenvolvido por HENZO BASTIAN</span>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>DATA</th>
+                <th>MOTORISTA</th>
+                <th>PLACA</th>
+                <th>ORIGEM</th>
+                <th>POSIÇÃO/STATUS</th>
+                <th>DESTINO</th>
+                <th>GE</th>
+                <th>CTE</th>
+            </tr>
+        </thead>
+        <tbody>
+            <script>
+                const opcoesOrigem = [
+                    "JD HORIZONTINA/RS",
+                    "JD MONTENEGRO/RS",
+                    "JD CATALÃO/GO",
+                    "RESIPLASTIC",
+                    "TUPER",
+                    "USIMINAS"
+                ];
+                const opcoesDestino = [
+                    "TUPER",
+                    "RESIPLASTIC",
+                    "USIMINAS",
+                    "JD MONTENEGRO/RS",
+                    "JD HORIZONTINA/RS",
+                    "JD CATALÃO/GO"
+                ];
+
+                for (let i = 1; i <= 15; i++) {
+                    document.write(`
+                        <tr class="linha-dados" id="linha-${i}" onclick="toggleAba(this)">
+                            <td id="data-display-${i}"></td>
+                            <td id="motorista-display-${i}">
+                                <span class="arrow"></span><span id="motorista-name-${i}">MOTORISTA ${i}</span>
+                                <span class="out-text" id="out-text-${i}">OUT</span>
+                                <span class="ftl-text" id="ftl-text-${i}">FTL</span>
+                            </td>
+                            <td id="placa-display-${i}">ABC-${1000 + i}</td>
+                            <td id="origem-display-${i}"></td>
+                            <td id="posicao-display-${i}"></td>
+                            <td id="destino-display-${i}">DESTINO ${i}</td>
+                            <td id="ge-display-${i}"></td>
+                            <td id="cte-display-${i}"></td>
+                        </tr>
+                        <tr class="aba-oculta">
+                            <td colspan="8">
+                                <div>
+                                    <label for="motorista-${i}">Motorista:</label>
+                                    <input type="text" id="motorista-${i}" value="MOTORISTA ${i}" onblur="atualizarMotoristaEData(this, ${i})"><br><br>
+
+                                    <label for="placa-${i}">Placa:</label>
+                                    <input type="text" id="placa-${i}" value="ABC-${1000 + i}" onblur="atualizarCelulasTexto(this, 'placa', ${i})"><br><br>
+
+                                    <label for="origem-${i}">Origem:</label>
+                                    <select id="origem-${i}" onchange="atualizarCelulas(this, 'Origem', ${i})">
+                                        <option value="">SELECIONE A ORIGEM</option>
+                                        ${opcoesOrigem.map(opcao => `<option value="${opcao}">${opcao}</option>`).join('')}
+                                    </select><br><br>
+
+                                    <label for="posicao-${i}">Posição:</label>
+                                    <input type="text" id="posicao-${i}" onblur="adicionarDataHora(this, ${i})"><br><br>
+
+                                    <label for="destino-${i}">Destino:</label>
+                                    <input type="text" id="destino-${i}" list="opcoes-destino-${i}" value="DESTINO ${i}" onblur="atualizarCelulasTexto(this, 'destino', ${i})">
+                                    <datalist id="opcoes-destino-${i}">
+                                        ${opcoesDestino.map(opcao => `<option value="${opcao}">`).join('')}
+                                    </datalist><br><br>
+
+                                    <label>GE:</label>
+                                    <input type="radio" id="ge-iniciado-${i}" name="ge-${i}" value="INICIADO APP" onclick="atualizarCelulas(this, 'GE', ${i})">
+                                    <label for="ge-iniciado-${i}">INICIADO APP</label>
+                                    <input type="radio" id="ge-final-${i}" name="ge-${i}" value="FINAL APP" onclick="atualizarCelulas(this, 'GE', ${i})">
+                                    <label for="ge-final-${i}">FINAL APP</label><br><br>
+
+                                    <label>CTE:</label>
+                                    <input type="radio" id="cte-nao-baixado-${i}" name="cte-${i}" value="NÃO BAIXADO" onclick="atualizarCelulas(this, 'CTE', ${i})">
+                                    <label for="cte-nao-baixado-${i}">NÃO BAIXADO</label>
+                                    <input type="radio" id="cte-baixado-${i}" name="cte-${i}" value="BAIXADO" onclick="atualizarCelulas(this, 'CTE', ${i})">
+                                    <label for="cte-baixado-${i}">BAIXADO</label><br><br>
+
+                                    <label for="prazo-entrega-${i}">Prazo de Entrega:</label>
+                                    <input type="datetime-local" id="prazo-entrega-${i}" onchange="atualizarPrazoEntrega(this, ${i})"><br><br>
+                                    
+                                    <label>Operação:</label>
+                                    <input type="radio" id="operacao-outbound-${i}" name="operacao-${i}" value="OUTBOUND" onclick="atualizarOperacao(this, ${i})">
+                                    <label for="operacao-outbound-${i}">OUTBOUND</label>
+                                    <input type="radio" id="operacao-ftl-${i}" name="operacao-${i}" value="FTL" onclick="atualizarOperacao(this, ${i})">
+                                    <label for="operacao-ftl-${i}">FTL</label><br><br>
+
+                                    <label>Status Viagem:</label>
+                                    <input type="radio" id="status-emviagem-${i}" name="status-viagem-${i}" value="EM VIAGEM" onclick="gerenciarStatusViagem(this, ${i})">
+                                    <label for="status-emviagem-${i}">EM VIAGEM</label>
+                                    <input type="radio" id="status-semviagem-${i}" name="status-viagem-${i}" value="SEM VIAGEM" onclick="gerenciarStatusViagem(this, ${i})">
+                                    <label for="status-semviagem-${i}">SEM VIAGEM</label><br><br>
+                                </div>
+                            </td>
+                        </tr>
+                    `);
+                }
+            </script>
+        </tbody>
+    </table>
+
+    <script>
+        const prazosEntrega = {};
+        const destinoBlinkIntervals = {};
+        const operacaoSelecionadaPorLinha = {}; // Para armazenar a operação de cada linha
+
+        function toggleAba(row) {
+            const aba = row.nextElementSibling;
+            const arrow = row.querySelector('.arrow');
+
+            if (aba && aba.classList.contains('aba-oculta')) {
+                const isOpen = aba.style.display === 'table-row';
+                aba.style.display = isOpen ? 'none' : 'table-row';
+
+                if (arrow) {
+                    if (isOpen) {
+                        arrow.classList.remove('open');
+                    } else {
+                        arrow.classList.add('open');
+                    }
+                }
+            }
+        }
+
+        function formatarDataCurta(data) {
+            const dia = String(data.getDate()).padStart(2, '0');
+            const mes = String(data.getMonth() + 1).padStart(2, '0');
+            const ano = data.getFullYear();
+            return `${dia}/${mes}/${ano}`;
+        }
+
+        function atualizarMotoristaEData(inputElement, rowIndex) {
+            const valorDigitado = inputElement.value;
+            const motoristaNameSpan = document.getElementById(`motorista-name-${rowIndex}`);
+            const dataDisplayCell = document.getElementById(`data-display-${rowIndex}`);
+            
+            if (motoristaNameSpan) {
+                motoristaNameSpan.textContent = valorDigitado;
+            }
+
+            if (valorDigitado.trim() !== '') {
+                const now = new Date();
+                dataDisplayCell.textContent = formatarDataCurta(now);
+            } else {
+                dataDisplayCell.textContent = '';
+            }
+        }
+
+        function adicionarDataHora(inputElement, rowIndex) {
+            if (inputElement.value.trim() !== '') {
+                const now = new Date();
+                const dataHoraFormatada = now.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'medium' });
+                inputElement.value = `${inputElement.value} (${dataHoraFormatada})`;
+
+                const mainRow = document.getElementById(`linha-${rowIndex}`);
+                if (mainRow) {
+                    mainRow.children[4].textContent = inputElement.value; // Posição/Status (índice 4)
+                }
+            }
+        }
+
+        function atualizarCelulasTexto(inputElement, colunaNome, rowIndex) {
+            const valorDigitado = inputElement.value;
+            const targetCell = document.getElementById(`${colunaNome}-display-${rowIndex}`);
+            if (targetCell) {
+                targetCell.textContent = valorDigitado;
+            }
+        }
+
+        function atualizarCelulas(element, coluna, rowIndex) {
+            let valorSelecionado = element.value;
+            const mainRow = document.getElementById(`linha-${rowIndex}`);
+            if (!mainRow) return;
+
+            let targetCell;
+            let classNameToAdd = '';
+
+            // Índices das colunas (0-indexed): DATA: 0, MOTORISTA: 1, PLACA: 2, ORIGEM: 3, POSIÇÃO/STATUS: 4, DESTINO: 5, GE: 6, CTE: 7
+
+            if (coluna === 'GE') {
+                targetCell = mainRow.children[6]; // GE (índice 6)
+                if (valorSelecionado === 'INICIADO APP') {
+                    classNameToAdd = 'ge-iniciado-app';
+                } else if (valorSelecionado === 'FINAL APP') {
+                    classNameToAdd = 'ge-final-app';
+                }
+            } else if (coluna === 'CTE') {
+                targetCell = mainRow.children[7]; // CTE (índice 7)
+                if (valorSelecionado === 'NÃO BAIXADO') {
+                    classNameToAdd = 'cte-nao-baixado';
+                } else if (valorSelecionado === 'BAIXADO') {
+                    classNameToAdd = 'cte-baixado';
+                }
+            } else if (coluna === 'Origem') {
+                targetCell = mainRow.children[3]; // Origem (índice 3)
+            }
+            
+            if (targetCell) {
+                targetCell.textContent = valorSelecionado;
+                
+                targetCell.classList.remove('ge-iniciado-app', 'ge-final-app', 'cte-nao-baixado', 'cte-baixado');
+                
+                if (classNameToAdd) {
+                    targetCell.classList.add(classNameToAdd);
+                }
+            }
+        }
+
+        function atualizarPrazoEntrega(inputElement, rowIndex) {
+            const prazoString = inputElement.value;
+            const linhaPrincipal = document.getElementById(`linha-${rowIndex}`);
+
+            if (prazosEntrega[rowIndex] && prazosEntrega[rowIndex].intervalId) {
+                clearInterval(prazosEntrega[rowIndex].intervalId);
+            }
+
+            if (prazoString) {
+                const prazoDate = new Date(prazoString);
+                
+                prazosEntrega[rowIndex] = {
+                    timestamp: prazoDate.getTime(),
+                    intervalId: null
+                };
+
+                prazosEntrega[rowIndex].intervalId = setInterval(() => {
+                    verificarAlarme(rowIndex);
+                }, 1000);
+
+                verificarAlarme(rowIndex);
+
+            } else {
+                linhaPrincipal.classList.remove('linha-vencida');
+                if (prazosEntrega[rowIndex]) {
+                    delete prazosEntrega[rowIndex];
+                }
+            }
+        }
+
+        function verificarAlarme(rowIndex) {
+            const linhaPrincipal = document.getElementById(`linha-${rowIndex}`);
+            if (!linhaPrincipal) return;
+
+            const prazoInfo = prazosEntrega[rowIndex];
+            if (prazoInfo) {
+                const agora = new Date().getTime();
+                if (agora > prazoInfo.timestamp) {
+                    linhaPrincipal.classList.add('linha-vencida');
+                } else {
+                    linhaPrincipal.classList.remove('linha-vencida');
+                }
+            }
+        }
+
+        function atualizarOperacao(inputElement, rowIndex) {
+            const operacaoSelecionada = inputElement.value;
+            const destinoCell = document.getElementById(`destino-display-${rowIndex}`);
+
+            // Armazena a opção de operação para uso posterior com Status Viagem
+            operacaoSelecionadaPorLinha[rowIndex] = operacaoSelecionada;
+
+            // Limpa qualquer efeito de piscar e classe de cor anterior no DESTINO
+            if (destinoBlinkIntervals[rowIndex]) {
+                clearInterval(destinoBlinkIntervals[rowIndex]);
+                delete destinoBlinkIntervals[rowIndex];
+            }
+            destinoCell.classList.remove('destino-outbound', 'destino-ftl');
+            destinoCell.style.color = ''; 
+
+            if (operacaoSelecionada === 'OUTBOUND') {
+                destinoCell.classList.add('destino-outbound');
+            } else if (operacaoSelecionada === 'FTL') {
+                destinoCell.classList.add('destino-ftl');
+            }
+            
+            // Reavalia o efeito de piscar de OUT/FTL na coluna Motorista se a linha estiver "EM VIAGEM"
+            const emViagemRadio = document.getElementById(`status-emviagem-${rowIndex}`);
+            if (emViagemRadio && emViagemRadio.checked) {
+                aplicarEfeitoViagem(rowIndex, operacaoSelecionada);
+            }
+        }
+
+        // Função para limpar todos os campos da aba oculta e células da linha principal
+        function limparCamposLinha(rowIndex) {
+            const mainRow = document.getElementById(`linha-${rowIndex}`);
+            const abaOculta = mainRow.nextElementSibling;
+
+            // Limpa células da linha principal
+            document.getElementById(`data-display-${rowIndex}`).textContent = '';
+            document.getElementById(`motorista-name-${rowIndex}`).textContent = ''; // Limpa o nome do motorista
+            document.getElementById(`placa-display-${rowIndex}`).textContent = '';
+            document.getElementById(`origem-display-${rowIndex}`).textContent = '';
+            document.getElementById(`posicao-display-${rowIndex}`).textContent = '';
+            document.getElementById(`destino-display-${rowIndex}`).textContent = '';
+            document.getElementById(`ge-display-${rowIndex}`).textContent = '';
+            document.getElementById(`cte-display-${rowIndex}`).textContent = '';
+
+            // Remove classes de cor e piscar
+            mainRow.classList.remove('linha-vencida');
+            document.getElementById(`destino-display-${rowIndex}`).classList.remove('destino-outbound', 'destino-ftl');
+            document.getElementById(`destino-display-${rowIndex}`).style.color = ''; // Resetar cor
+            
+            // Para o piscar de OUT/FTL
+            pararEfeitoViagem(rowIndex);
+
+            // Limpa os campos da aba oculta
+            const inputs = abaOculta.querySelectorAll('input[type="text"], input[type="datetime-local"]');
+            inputs.forEach(input => input.value = '');
+
+            const selects = abaOculta.querySelectorAll('select');
+            selects.forEach(select => select.selectedIndex = 0); // Seleciona a primeira opção (vazia)
+
+            const radios = abaOculta.querySelectorAll('input[type="radio"]');
+            radios.forEach(radio => radio.checked = false);
+
+            // Limpa alarmes de prazo de entrega
+            if (prazosEntrega[rowIndex]) {
+                clearInterval(prazosEntrega[rowIndex].intervalId);
+                delete prazosEntrega[rowIndex];
+            }
+
+            // Limpa a operação selecionada para esta linha
+            delete operacaoSelecionadaPorLinha[rowIndex];
+        }
+
+        // Função para aplicar o efeito de piscar OUT/FTL
+        function aplicarEfeitoViagem(rowIndex, operacao) {
+            const outText = document.getElementById(`out-text-${rowIndex}`);
+            const ftlText = document.getElementById(`ftl-text-${rowIndex}`);
+
+            // Garante que ambos estão ocultos e sem animação antes de aplicar o novo
+            outText.classList.remove('out-blinking', 'show');
+            ftlText.classList.remove('ftl-blinking', 'show');
+
+            if (operacao === 'OUTBOUND') {
+                outText.classList.add('out-blinking', 'show');
+            } else if (operacao === 'FTL') {
+                ftlText.classList.add('ftl-blinking', 'show');
+            }
+        }
+
+        // Função para parar o efeito de piscar OUT/FTL
+        function pararEfeitoViagem(rowIndex) {
+            const outText = document.getElementById(`out-text-${rowIndex}`);
+            const ftlText = document.getElementById(`ftl-text-${rowIndex}`);
+
+            if (outText) outText.classList.remove('out-blinking', 'show');
+            if (ftlText) ftlText.classList.remove('ftl-blinking', 'show');
+        }
+
+
+        function gerenciarStatusViagem(inputElement, rowIndex) {
+            const statusSelecionado = inputElement.value;
+
+            if (statusSelecionado === 'SEM VIAGEM') {
+                limparCamposLinha(rowIndex);
+            } else if (statusSelecionado === 'EM VIAGEM') {
+                // Ao marcar "EM VIAGEM", verifica a operação para aplicar o piscar
+                const operacao = operacaoSelecionadaPorLinha[rowIndex];
+                if (operacao) { // Se uma operação já foi selecionada
+                    aplicarEfeitoViagem(rowIndex, operacao);
+                } else {
+                    // Se "EM VIAGEM" for marcado e nenhuma operação (OUTBOUND/FTL) estiver selecionada,
+                    // Garante que nenhum efeito de piscar de OUT/FTL esteja ativo.
+                    pararEfeitoViagem(rowIndex);
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
